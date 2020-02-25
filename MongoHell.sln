@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "src\Repository\Repository.csproj", "{4E405D05-157A-480E-9DC6-70DBE2E5080D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D8DEF650-597E-41F7-84AA-523314E15A78}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{77A14D47-67D0-402A-A0C8-D8B1ACE85B60}"
+ProjectSection(SolutionItems) = preProject
+	LICENSE = LICENSE
+	presentation.md = presentation.md
+	README.md = README.md
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{5A9B2A3B-6FE2-44C1-99E4-DCA4BE98BBA0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D} = {D8DEF650-597E-41F7-84AA-523314E15A78}
+	EndGlobalSection
+EndGlobal
