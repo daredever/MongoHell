@@ -143,29 +143,27 @@ _Вывод - все просто._
 ```c#
 public class Profiler : IProfiler
 {
-    public void Start(string stage, string key)
+    public Profiler(string stage, string key)
     {
         _stage = stage;
         _key = key;
         _stopwatch = Stopwatch.StartNew();
     }
 
-    public void Stop()
+    public void Dispose()
     {
         if (_stopwatch is null) return;
-        _stopwatch.Stop();        
+        _stopwatch.Stop();   
+        long _nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
+        long _nanosecToMillisec = 1000L * 1000L;     
         var time =  Math.Round((decimal) (_stopwatch.ElapsedTicks * _nanosecPerTick) / _nanosecToMillisec, 4);        
+        
         // write data
-    }
-
-    public void Dispose() => Stop();
+    };
     
     private Stopwatch _stopwatch;
-    private string _stage = NOT_DEFINED;
-    private string _key = NOT_DEFINED;
-    private const string NOT_DEFINED = "NOT_DEFINED";
-    private readonly long _nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
-    private readonly long _nanosecToMillisec = 1000L * 1000L;
+    private readonly string _stage;
+    private readonly string _key;
 }
 
 public class ProfilerFactory : IProfilerFactory
@@ -181,7 +179,7 @@ public class ProfilerFactory : IProfilerFactory
 
 Использование:
 ```c#
-using var profiler = _profilerFactory.GetProfiler("UPDATE", entityName);
+using var profiler = _profilerFactory.GetProfiler(stage, key);
 // do some work
 ```
 
