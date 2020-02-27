@@ -163,8 +163,6 @@ public class Profiler : IProfiler
     private Stopwatch _stopwatch;
     private string _stage = NOT_DEFINED;
     private string _key = NOT_DEFINED;
-
-    private const string PROFILING = "PROFILING";
     private const string NOT_DEFINED = "NOT_DEFINED";
     private readonly long _nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
     private readonly long _nanosecToMillisec = 1000L * 1000L;
