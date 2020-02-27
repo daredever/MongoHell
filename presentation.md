@@ -152,7 +152,6 @@ public class Profiler : IProfiler
 
     public void Dispose()
     {
-        if (_stopwatch is null) return;
         _stopwatch.Stop();   
         long _nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
         long _nanosecToMillisec = 1000L * 1000L;     
@@ -161,25 +160,17 @@ public class Profiler : IProfiler
         // write data
     };
     
+    public static Profiler GetProfiler(string stage, string key) => return new Profiler(stage, key);
+    
     private Stopwatch _stopwatch;
     private readonly string _stage;
     private readonly string _key;
-}
-
-public class ProfilerFactory : IProfilerFactory
-{
-    public IProfiler GetProfiler(string stage, string key)
-    {
-        var profiler = new Profiler();
-        profiler.Start(stage, key);
-        return profiler;
-    }
 }
 ```
 
 Использование:
 ```c#
-using var profiler = _profilerFactory.GetProfiler(stage, key);
+using var profiler = Profiler.GetProfiler(stage, key);
 // do some work
 ```
 
