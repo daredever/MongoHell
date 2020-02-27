@@ -141,7 +141,7 @@ _Вывод - все просто._
 Добавили профилирование в код, чтобы понимать где конкретно происходят тормоза.
 
 ```c#
-public class Profiler : IProfiler
+public class Profiler
 {
     public Profiler(string stage, string key)
     {
