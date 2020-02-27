@@ -141,7 +141,7 @@ _Вывод - все просто._
 Добавили профилирование в код, чтобы понимать где конкретно происходят тормоза.
 
 ```c#
-public class Profiler
+public sealed class Profiler : IDisposable
 {
     public Profiler(string stage, string key)
     {
@@ -152,17 +152,17 @@ public class Profiler
 
     public void Dispose()
     {
-        _stopwatch.Stop();   
-        long _nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
-        long _nanosecToMillisec = 1000L * 1000L;     
-        var time =  Math.Round((decimal) (_stopwatch.ElapsedTicks * _nanosecPerTick) / _nanosecToMillisec, 4);        
-        
-        // write data
-    };
-    
-    public static Profiler GetProfiler(string stage, string key) => return new Profiler(stage, key);
-    
-    private Stopwatch _stopwatch;
+        _stopwatch.Stop();
+        var nanosecPerTick = (1000L * 1000L * 1000L) / Stopwatch.Frequency;
+        var nanosecToMillisec = 1000L * 1000L;
+        var timeInMillisec = Math.Round((decimal) (_stopwatch.ElapsedTicks * nanosecPerTick) / nanosecToMillisec, 4);
+
+        // write data with _stage, _key and timeInMillisec
+    }
+
+    public static Profiler GetProfiler(string stage, string key) => new Profiler(stage, key);
+
+    private readonly Stopwatch _stopwatch;
     private readonly string _stage;
     private readonly string _key;
 }
