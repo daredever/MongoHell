@@ -5,10 +5,9 @@ namespace Repository
 {
 	public sealed class Profiler : IDisposable
 	{
-		public Profiler(string stage, string key)
+		public Profiler(string stage)
 		{
 			_stage = stage;
-			_key = key;
 			_stopwatch = Stopwatch.StartNew();
 		}
 
@@ -19,13 +18,12 @@ namespace Repository
 			var nanosecToMillisec = 1000L * 1000L;
 			var timeInMillisec = Math.Round((decimal) (_stopwatch.ElapsedTicks * nanosecPerTick) / nanosecToMillisec, 4);
 
-			// write data with _stage, _key and timeInMillisec
+			// write data with _stage and timeInMillisec
 		}
 
-		public static Profiler GetProfiler(string stage, string key) => new Profiler(stage, key);
+		public static Profiler GetProfiler(string stage) => new Profiler(stage);
 
 		private readonly Stopwatch _stopwatch;
 		private readonly string _stage;
-		private readonly string _key;
 	}
 }
