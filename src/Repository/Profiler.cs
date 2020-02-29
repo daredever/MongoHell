@@ -15,15 +15,14 @@ namespace Repository
 		{
 			_stopWatch.Stop();
 			
-			var timeInMillisec = Math.Round((decimal) (_stopWatch.ElapsedTicks * _nanosecPerTick) / _nanosecToMillisec, 4);
-
-			// write data with _stage and timeInMillisec
+			var workTime = Math.Round((decimal) (_stopWatch.ElapsedTicks * _nanosecPerTick) / _nanosecToMillisec, 4);
+			// write data with _stage and workTime in milliseconds
 		}
 
 		public static Profiler GetProfiler(string stage) => new Profiler(stage);
 
-		private static long _nanosecPerTick = 1000000000L / Stopwatch.Frequency;
-		private static long _nanosecToMillisec = 1000000L;
+		private static readonly long _nanosecPerTick = 1000000000L / Stopwatch.Frequency;
+		private static readonly long _nanosecToMillisec = 1000000L;
 		
 		private readonly Stopwatch _stopWatch;
 		private readonly string _stage;
