@@ -94,7 +94,7 @@ _Вывод - начать с малого._
 
 - Простота использования (Пример репозитория CRUD). 
 
-Качаем nuget пакет MongoDB.Client 
+Качаем nuget пакет MongoDB.Driver 
 
 ```c#
 public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
@@ -277,7 +277,7 @@ _Вывод - надо аккуратно проектировать._
 
 (тут примеры js кода)
 
-- Рассказать про nuget MongoDB.Client, Core, Bson.
+- Рассказать про nuget MongoDB.Driver, Core, Bson.
 - Выделение отдельной сущности для singleton MongoClient - управление пулом коннектов и dispose автоматические.
 Рассказать про генераторы в js.
 
