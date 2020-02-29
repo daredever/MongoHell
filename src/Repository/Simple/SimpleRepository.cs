@@ -13,7 +13,7 @@ namespace Repository.Simple
 			_mongoDatabase = client.GetDatabase(databaseName);
 		}
 
-		public Task AddOrUpdateItemAsync(T item, string collectionName)
+		public virtual Task AddOrUpdateItemAsync(T item, string collectionName)
 		{
 			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
 			var options = new ReplaceOptions {IsUpsert = true};
@@ -21,14 +21,14 @@ namespace Repository.Simple
 			return keyCollection.ReplaceOneAsync(x => x.ExternalId == item.ExternalId, item, options);
 		}
 
-		public async Task<T> GetItemAsync(string id, string collectionName)
+		public virtual async Task<T> GetItemAsync(string id, string collectionName)
 		{
 			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
 			using var cursor = await keyCollection.FindAsync(x => x.ExternalId == id);
 			return await cursor.SingleOrDefaultAsync();
 		}
 
-		public Task DeleteItemAsync(string id, string collectionName)
+		public virtual Task DeleteItemAsync(string id, string collectionName)
 		{
 			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
 			return keyCollection.DeleteOneAsync(x => x.ExternalId == id);
