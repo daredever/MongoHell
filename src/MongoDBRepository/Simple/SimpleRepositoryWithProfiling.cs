@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
+using Core;
 
-namespace Repository.Simple
+namespace MongoDBRepository.Simple
 {
 	public class SimpleRepositoryWithProfiling<T> : SimpleRepository<T> where T : IMongoModel
 	{

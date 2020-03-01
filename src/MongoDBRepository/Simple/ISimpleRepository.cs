@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Repository.Simple
+namespace MongoDBRepository.Simple
 {
 	public interface ISimpleRepository<T>
 	{

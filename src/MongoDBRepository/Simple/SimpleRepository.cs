@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using MongoDB.Driver;
 
-namespace Repository.Simple
+namespace MongoDBRepository.Simple
 {
 	public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
 	{

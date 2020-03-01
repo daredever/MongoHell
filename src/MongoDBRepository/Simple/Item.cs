@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Repository.Simple
+namespace MongoDBRepository.Simple
 {
 	public sealed class Item : IMongoModel
 	{

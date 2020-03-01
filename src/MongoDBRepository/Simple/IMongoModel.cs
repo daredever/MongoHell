@@ -1,4 +1,4 @@
-﻿namespace Repository
+﻿namespace MongoDBRepository.Simple
 {
 	public interface IMongoModel
 	{
