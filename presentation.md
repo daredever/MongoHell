@@ -360,7 +360,7 @@ _Вывод - BSON это гибкость, но сериализация тре
 ## Q&A + Ссылки и контакты
 
 MongoDB:
-
+- https://en.wikipedia.org/wiki/MongoDB
 - https://jira.mongodb.org/
 - https://github.com/mongodb/
 - https://docs.mongodb.com/
