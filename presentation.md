@@ -306,6 +306,7 @@ _Вывод - надо аккуратно проектировать._
 
 - Транзакции - основы работы.
 В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID.
+https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability
 
 ```c#
 var sessionOptions = new ClientSessionOptions
