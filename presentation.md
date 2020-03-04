@@ -268,6 +268,10 @@ public class SimpleRepositoryWithProfiling<T> : SimpleRepository<T> where T : IM
 
 (тут картинка - несколько таблиц превращаются в одну коллекцию)
 
+https://docs.mongodb.com/manual/core/data-model-design/#data-modeling-embedding
+
+https://docs.mongodb.com/manual/core/data-model-design/#data-modeling-referencing
+
 - collection != table. Хранение произвольных объектов в одной коллекции - добавить примеры (контрагенты - физлица и юрлица в одной коллекции).
 - Сложный документ - значит транзакции частно не нужны - можно хранить все в одном документе.
 
@@ -277,9 +281,15 @@ public class SimpleRepositoryWithProfiling<T> : SimpleRepository<T> where T : IM
 
 - Измения в архитектуре и Переписываем реализацию старых(реляционных) репозиториев.
 - Высокая трудоемкость при проектировании - plain-table перевести просто, остальное сложно и требуется переработка. 
-- Ограничение на размер (16мб) и глубину документа (1000).
-- Анализ индексов при проектирование и на бою под нагрузкой.
+- Ограничение на размер (16мб) и глубину документа (100). https://docs.mongodb.com/manual/reference/limits/
+- Анализ индексов при проектирование и на бою под нагрузкой. MongoDB uses B-trees for its indexes. A single collection can have no more than 64 indexes.
 - Особенности использования индексов при построении запросов - один индекс на запрос (поискать hint в монго-клиенте).
+Performance:
+- Because the index contains all fields required by the query, MongoDB can both match the query conditions and return the results using only the index.
+- Querying only the index can be much faster than querying documents outside of the index. Index keys are typically smaller than the documents they catalog, and indexes are typically available in RAM or located sequentially on disk.
+- In most cases the query optimizer selects the optimal index for a specific operation; however, you can force MongoDB to use a specific index using the hint() method. Use hint() to support performance testing, or on some queries where you must select a field or field included in several indexes.
+
+- план запросов - https://docs.mongodb.com/manual/reference/explain-results/
 
 _Вывод - надо аккуратно проектировать._
 
@@ -289,8 +299,14 @@ _Вывод - надо аккуратно проектировать._
 
 Особенности при переходе на MongoDB.
 
-- MongoShell - добавить определение. DSL - добавить определение. Начать изучение монги лучше отсюда. 
-Рассказать про генераторы в js. Обратить внимание на перенос строк \n и ограниченную длину строки (не все документы помещаются)
+- MongoShell - добавить определение(https://docs.mongodb.com/manual/mongo/). 
+
+DSL - добавить определение. Начать изучение монги лучше отсюда. (https://docs.mongodb.com/manual/crud/)
+
+Рассказать про генераторы в js. 
+
+Обратить внимание на перенос строк \n и ограниченную длину строки (не все документы помещаются)
+The mongo shell prompt has a limit of 4095 codepoints for each line. If you enter a line with more than 4095 codepoints, the shell will truncate it.
 
 (тут примеры js кода)
 
@@ -311,8 +327,13 @@ _Вывод - надо аккуратно проектировать._
 (тут примеры кода)
 
 - Транзакции - основы работы.
-В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID.
+В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID:
+- In version 4.0, MongoDB supports multi-document transactions on replica sets.
+- In version 4.2, MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
+
 https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability
+
+https://docs.mongodb.com/manual/core/transactions/
 
 ```c#
 var sessionOptions = new ClientSessionOptions
@@ -327,7 +348,12 @@ session.StartTransaction(transactionOptions);
 if (result.Succeeded) await session.CommitTransactionAsync();
 ```
 
-- Нет атрибутов для индексов, кроме BsonId. Рассказать про правила именования Id про ObjectId.
+- Нет атрибутов для индексов, кроме BsonId. Рассказать про правила именования Id и про ObjectId.
+
+ObjectIds are small, likely unique, fast to generate, and ordered. ObjectId values are 12 bytes in length, consisting of:
+- a 4-byte timestamp value, representing the ObjectId’s creation, measured in seconds since the Unix epoch
+- a 5-byte random value
+- a 3-byte incrementing counter, initialized to a random value
 
 ## 9 круг - Для отступников и предателей всех сортов.
 
@@ -338,20 +364,28 @@ if (result.Succeeded) await session.CommitTransactionAsync();
 Неудобный MongoDB Compass. Есть DataGrip, Robo 3T.
 Рассказать про средства мониторинга запросов, explain, план запроса.
 
-- Проблема с транзакциями (работают только в режиме кластера). надо найти текст ошибок в монге и монго драйвере (retry writes)
+- Проблема с транзакциями (работают только в режиме кластера). надо найти текст ошибок в монге и монго драйвере (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/)
 
 *Рома:*
 
 Проблемы выявленные при тестировании:
 
-- Проблемы сериализации GUID - добавить список.
+- Проблемы сериализации GUID.
+ 
+https://studio3t.com/knowledge-base/articles/mongodb-best-practices-uuid-data/#mongodb-uuid-data
+
+список - https://api.mongodb.com/csharp/current/html/T_MongoDB_Bson_GuidRepresentation.htm
 
 ```c#
 BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
 ```
 
 - Проблема версий пакета Mongo.Bson (DateTimeOffset) и необходимость интеграционных тестов на сериализацию/десериализацию.
-(надо воспроизвести, указать версии пакетов, сравнить код сериализатора)
+(надо воспроизвести, указать версии пакетов, сравнить код сериализатора):
+- https://jira.mongodb.org/browse/CSHARP-1483
+- https://stackoverflow.com/questions/16765543/properly-using-handling-datetimeoffset-in-mongodb
+- https://stackoverflow.com/questions/10480127/mongodb-and-datetimeoffset-type
+- https://blog.krusen.dk/c-mongodb-serialization-of-datetimeoffset/
 
 ## Дорога к раю.
 
