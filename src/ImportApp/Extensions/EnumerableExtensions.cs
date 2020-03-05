@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImportApp.Extensions
 {
-	public static class EnumerableExtentions
+	public static class EnumerableExtensions
 	{
 		/// <summary>
 		/// Performs the specified delegate on each element of a collection. 
