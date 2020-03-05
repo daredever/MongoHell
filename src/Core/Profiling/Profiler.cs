@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 
-namespace Core
+namespace Core.Profiling
 {
 	public sealed class Profiler : IDisposable
 	{
-		public Profiler(string stage)
+		private Profiler(string stage)
 		{
 			_stage = stage;
 			_stopWatch = Stopwatch.StartNew();
@@ -14,10 +15,8 @@ namespace Core
 		public void Dispose()
 		{
 			_stopWatch.Stop();
-			
 			var workTime = Math.Round(_stopWatch.ElapsedTicks * MillisecPerTick, 4);
-			// write data with _stage and workTime in milliseconds
-			Console.WriteLine($"{_stage}, {workTime}");
+			Console.WriteLine($"[{DateTime.Now}] {_stage}, {workTime.ToString(CultureInfo.InvariantCulture)}");
 		}
 
 		public static Profiler GetProfiler(string stage) => new Profiler(stage);

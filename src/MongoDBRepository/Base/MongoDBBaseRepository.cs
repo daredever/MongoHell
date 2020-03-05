@@ -1,13 +1,16 @@
 ﻿using System.Threading.Tasks;
+using Core.Models;
+using Core.Repositories;
 using MongoDB.Driver;
+using MongoDBRepository.Models;
 
-namespace MongoDBRepository.Simple
+namespace MongoDBRepository.Base
 {
-	public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
+	public class MongoDBBaseRepository<T> : IBaseRepository<T> where T : IBaseModel
 	{
 		private readonly IMongoDatabase _mongoDatabase;
 
-		public SimpleRepository(string connectionString, string databaseName)
+		public MongoDBBaseRepository(string connectionString, string databaseName)
 		{
 			var client = new MongoClient(connectionString);
 			_mongoDatabase = client.GetDatabase(databaseName);

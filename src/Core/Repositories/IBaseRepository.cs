@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace MongoDBRepository.Simple
+namespace Core.Repositories
 {
-	public interface ISimpleRepository<T>
+	public interface IBaseRepository<T>
 	{
 		Task AddOrUpdateItemAsync(T item, string collectionName);
 		Task<T> GetItemAsync(string id, string collectionName);

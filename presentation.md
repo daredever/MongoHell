@@ -113,17 +113,17 @@ public interface IMongoModel
     string ExternalId { get; set; }
 }
 
-public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
+public class MongoDBBaseRepository<T> : IBaseRepository<T> where T : IBaseModel
 {
     private readonly IMongoDatabase _mongoDatabase;
 
-    public SimpleRepository(string connectionString, string databaseName)
+    public MongoDBBaseRepository(string connectionString, string databaseName)
     {
         var client = new MongoClient(connectionString);
         _mongoDatabase = client.GetDatabase(databaseName);
     }
 
-    public Task AddOrUpdateItemAsync(T item, string collectionName)
+    public virtual Task AddOrUpdateItemAsync(T item, string collectionName)
     {
         var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
         var options = new ReplaceOptions {IsUpsert = true};
@@ -131,14 +131,14 @@ public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
         return keyCollection.ReplaceOneAsync(x => x.ExternalId == item.ExternalId, item, options);
     }
 
-    public async Task<T> GetItemAsync(string id, string collectionName)
+    public virtual async Task<T> GetItemAsync(string id, string collectionName)
     {
         var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
         using var cursor = await keyCollection.FindAsync(x => x.ExternalId == id);
         return await cursor.SingleOrDefaultAsync();
     }
 
-    public Task DeleteItemAsync(string id, string collectionName)
+    public virtual Task DeleteItemAsync(string id, string collectionName)
     {
         var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
         return keyCollection.DeleteOneAsync(x => x.ExternalId == id);
@@ -155,7 +155,7 @@ public class SimpleRepository<T> : ISimpleRepository<T> where T : IMongoModel
 ```c#
 public sealed class Profiler : IDisposable
 {
-    public Profiler(string stage)
+    private Profiler(string stage)
     {
         _stage = stage;
         _stopWatch = Stopwatch.StartNew();
@@ -164,10 +164,8 @@ public sealed class Profiler : IDisposable
     public void Dispose()
     {
         _stopWatch.Stop();
-        
         var workTime = Math.Round(_stopWatch.ElapsedTicks * MillisecPerTick, 4);
-        // write data with _stage and workTime in milliseconds
-        Console.WriteLine($"{_stage}, {workTime}");
+        Console.WriteLine($"[{DateTime.Now}] {_stage}, {workTime.ToString(CultureInfo.InvariantCulture)}");
     }
 
     public static Profiler GetProfiler(string stage) => new Profiler(stage);
@@ -181,28 +179,35 @@ public sealed class Profiler : IDisposable
 
 Показать декоратор с подключенным профилированием:
 ```c#
-public class SimpleRepositoryWithProfiling<T> : SimpleRepository<T> where T : IMongoModel
+public class HellRepository : MongoDBBaseRepository<HellModel>
 {
-    public SimpleRepositoryWithProfiling(string connectionString, string databaseName) 
-        : base(connectionString, databaseName)
+    public HellRepository(string connectionString, string databaseName) : base(connectionString, databaseName)
     {
     }
+}
 
-    public override Task AddOrUpdateItemAsync(T item, string collectionName)
+public class HellRepositoryWithProfiling : HellRepository
+{
+    public HellRepositoryWithProfiling(string connectionString, string databaseName) : base(connectionString, databaseName)
     {
-        using var profiler = Profiler.GetProfiler(nameof(SimpleRepository<T>.AddOrUpdateItemAsync));
+        
+    }
+
+    public override Task AddOrUpdateItemAsync(HellModel item, string collectionName)
+    {
+        using var profiler = Profiler.GetProfiler(nameof(HellRepository.AddOrUpdateItemAsync));
         return base.AddOrUpdateItemAsync(item, collectionName);
     }
 
-    public override Task<T> GetItemAsync(string id, string collectionName)
+    public override Task<HellModel> GetItemAsync(string id, string collectionName)
     {
-        using var profiler = Profiler.GetProfiler(nameof(SimpleRepository<T>.GetItemAsync));
+        using var profiler = Profiler.GetProfiler(nameof(HellRepository.GetItemAsync));
         return base.GetItemAsync(id, collectionName);
     }
 
     public override Task DeleteItemAsync(string id, string collectionName)
     {
-        using var profiler = Profiler.GetProfiler(nameof(SimpleRepository<T>.DeleteItemAsync));
+        using var profiler = Profiler.GetProfiler(nameof(HellRepository.DeleteItemAsync));
         return base.DeleteItemAsync(id, collectionName);
     }
 }
@@ -212,6 +217,14 @@ public class SimpleRepositoryWithProfiling<T> : SimpleRepository<T> where T : IM
 - Показываем что схемы не было и автоматически создались база и коллекции. 
 Можно повторить N раз меняя имя базы и коллекции.
 показываем что для ПГ надо было постоянно контролировать схему и миграции.
+
+Рассказать про правила именования Id и про ObjectId.
+
+ObjectIds are small, likely unique, fast to generate, and ordered. ObjectId values are 12 bytes in length, consisting of:
+- a 4-byte timestamp value, representing the ObjectId’s creation, measured in seconds since the Unix epoch
+- a 5-byte random value
+- a 3-byte incrementing counter, initialized to a random value
+    
 - Перфоманс из коробки - показываем график из данных профилирования (все быстро и хорошо).
 
 
@@ -322,7 +335,9 @@ The mongo shell prompt has a limit of 4095 codepoints for each line. If you ente
 
 (тут примеры кода)
 
-- Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. JObject отсутствует из коробки - сравнить в Newton.JSON и рассказать как писать свои сериализаторы. BsonIgnore и другие атрибуты, показать пример в коде. Конвенции.
+- Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. JObject отсутствует из коробки - сравнить в Newton.JSON и рассказать как писать свои сериализаторы. BsonIgnore и другие атрибуты, показать пример в коде. 
+
+Конвенции - https://github.com/mongodb/mongo-csharp-driver/tree/master/src/MongoDB.Bson/Serialization/Conventions.
 
 (тут примеры кода)
 
@@ -348,12 +363,7 @@ session.StartTransaction(transactionOptions);
 if (result.Succeeded) await session.CommitTransactionAsync();
 ```
 
-- Нет атрибутов для индексов, кроме BsonId. Рассказать про правила именования Id и про ObjectId.
-
-ObjectIds are small, likely unique, fast to generate, and ordered. ObjectId values are 12 bytes in length, consisting of:
-- a 4-byte timestamp value, representing the ObjectId’s creation, measured in seconds since the Unix epoch
-- a 5-byte random value
-- a 3-byte incrementing counter, initialized to a random value
+- Нет атрибутов для индексов, кроме BsonId. 
 
 ## 9 круг - Для отступников и предателей всех сортов.
 
