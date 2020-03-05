@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Core.Models;
 using Core.Repositories;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongoDBRepository.Models;
 
@@ -12,6 +13,9 @@ namespace MongoDBRepository.Base
 
 		public MongoDBBaseRepository(string connectionString, string databaseName)
 		{
+			var pack = new ConventionPack {new IgnoreExtraElementsConvention(true)};
+			ConventionRegistry.Register("Hell conventions", pack, t => true);
+
 			var client = new MongoClient(connectionString);
 			_mongoDatabase = client.GetDatabase(databaseName);
 		}
