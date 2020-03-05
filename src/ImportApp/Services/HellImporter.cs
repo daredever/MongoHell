@@ -9,22 +9,20 @@ namespace ImportApp.Services
 {
 	public class HellImporter
 	{
-		private readonly HellRepository _mongoRepo;
 		private const int Partitions = 20;
+		private const string CollectionName = "HellModelCollection";
+		
+		private readonly HellRepository _mongoRepo;
 
-		public HellImporter(HellRepository mongoRepo)
-		{
-			_mongoRepo = mongoRepo;
-		}
+		public HellImporter(HellRepository mongoRepo) => _mongoRepo = mongoRepo;
 
 		public async Task ImportAsync()
 		{
-			var collectionName = $"{nameof(HellModel)}";
-			async Task Add(HellModel item) => await _mongoRepo.AddOrUpdateItemAsync(item, collectionName);
-
 			var items = GetDataFromSource();
 			await items.ForEachAsync(Partitions, Add);
 		}
+		
+		private Task Add(HellModel item) => _mongoRepo.AddOrUpdateItemAsync(item, CollectionName);
 
 		private IEnumerable<HellModel> GetDataFromSource()
 		{
