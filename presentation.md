@@ -265,7 +265,7 @@ internal sealed class ConnectionManager : IConnectionManager
 
 (тут примеры кода)
 
-- Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. JObject отсутствует из коробки - сравнить в Newton.JSON и рассказать как писать свои сериализаторы. BsonIgnore и другие атрибуты, показать пример в коде. 
+- Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. JObject отсутствует из коробки - сравнить в Newtown.JSON и рассказать как писать свои сериализаторы. BsonIgnore и другие атрибуты, показать пример в коде. 
 
 Конвенции - https://github.com/mongodb/mongo-csharp-driver/tree/master/src/MongoDB.Bson/Serialization/Conventions.
 
