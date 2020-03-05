@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ImportApp.Services;
-using MongoDBRepository.Hell;
+using MongoHell.Repository;
 
 namespace ImportApp
 {
@@ -12,8 +12,8 @@ namespace ImportApp
 
 		private static async Task Main(string[] args)
 		{
-			var mongoRepo = new HellRepositoryWithProfiling(ConnectionString, Database);
-			var importer = new HellImporter(mongoRepo);
+			var mongoRepo = new MongoHellRepositoryWithProfiling(ConnectionString, Database);
+			var importer = new MongoHellImporter(mongoRepo);
 			await importer.ImportAsync();
 		}
 	}

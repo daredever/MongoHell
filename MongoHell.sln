@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDBRepository", "src\MongoDBRepository\MongoDBRepository.csproj", "{4E405D05-157A-480E-9DC6-70DBE2E5080D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoHell", "src\MongoHell\MongoHell.csproj", "{4E405D05-157A-480E-9DC6-70DBE2E5080D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D8DEF650-597E-41F7-84AA-523314E15A78}"
 EndProject

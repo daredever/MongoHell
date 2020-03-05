@@ -92,60 +92,28 @@ MongoDB изначально выходил под лицензией GNU Affero
 - Реализация стандартного  ETL процесса: source - mongodb - destination. 
 Рассказать этапы импорта из черного ящика (get from source, check if exists in db, insert or update to destination, update db).
 Описать суть проблемы. Описать решение на PG. 
-Показать структуру таблиц, рассказать о генерации схемы данных. 
+Показать структуру таблиц, рассказать о генерации схемы данных. Ппредаствим что у нас некая CRM для ада 
 Показать зачем нужна монга.   
 
-Дальше показываем как сделать простейший импорт (предаствим что у нас некая CRM для ада):
+Дальше показываем как сделать простейший импорт:
 
 - Показываем что ПГ поднят и там есть данные. Показываем репозиторий ПГ для чтения записей.
-Методы - получить список кругов ада, получить список монстров, получить список жителей ада. 
+Методы - получить список HellModel items. 
 
-- Поднимаем stadlalone. Поясняем Connection string.
+- Показываем yaml. Поднимаем stadlalone mongodb. Поясняем Connection string.
 Строка подключения имеет следующий вид: mongodb://[username:password@]hostname[:port][/[database][?options]]
 
-- Простота использования (Пример репозитория CRUD). 
+Показываем mongoCompass и пустую монгу и режим Standalone.
 
-Качаем nuget пакет MongoDB.Driver 
+- Простота использования (Пример репозитория CRUD). 
+Показываем nuget пакет MongoDB.Driver
+Показываем generic repository.
 
 ```c#
-public interface IMongoModel
-{
-    string ExternalId { get; set; }
-}
-
 public class MongoDBBaseRepository<T> : IBaseRepository<T> where T : IBaseModel
-{
-    private readonly IMongoDatabase _mongoDatabase;
 
-    public MongoDBBaseRepository(string connectionString, string databaseName)
-    {
-        var client = new MongoClient(connectionString);
-        _mongoDatabase = client.GetDatabase(databaseName);
-    }
-
-    public virtual Task AddOrUpdateItemAsync(T item, string collectionName)
-    {
-        var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
-        var options = new ReplaceOptions {IsUpsert = true};
-
-        return keyCollection.ReplaceOneAsync(x => x.ExternalId == item.ExternalId, item, options);
-    }
-
-    public virtual async Task<T> GetItemAsync(string id, string collectionName)
-    {
-        var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
-        using var cursor = await keyCollection.FindAsync(x => x.ExternalId == id);
-        return await cursor.SingleOrDefaultAsync();
-    }
-
-    public virtual Task DeleteItemAsync(string id, string collectionName)
-    {
-        var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
-        return keyCollection.DeleteOneAsync(x => x.ExternalId == id);
-    }
-}
 ```
-
+рассказ про mongo client.
 После выполнения всех необходимых операций нам необязательно закрывать подключение, 
 как, например, в случае с подключениями к другим базам данных, 
 так как MongoDB сама выполнит всю работу (найти инфу в документации).
@@ -154,80 +122,25 @@ public class MongoDBBaseRepository<T> : IBaseRepository<T> where T : IBaseModel
 
 ```c#
 public sealed class Profiler : IDisposable
-{
-    private Profiler(string stage)
-    {
-        _stage = stage;
-        _stopWatch = Stopwatch.StartNew();
-    }
-
-    public void Dispose()
-    {
-        _stopWatch.Stop();
-        var workTime = Math.Round(_stopWatch.ElapsedTicks * MillisecPerTick, 4);
-        Console.WriteLine($"[{DateTime.Now}] {_stage}, {workTime.ToString(CultureInfo.InvariantCulture)}");
-    }
-
-    public static Profiler GetProfiler(string stage) => new Profiler(stage);
-
-    private static readonly decimal MillisecPerTick = 1000m / Stopwatch.Frequency;
-
-    private readonly Stopwatch _stopWatch;
-    private readonly string _stage;
-}
 ```
 
 Показать декоратор с подключенным профилированием:
 ```c#
 public class HellRepository : MongoDBBaseRepository<HellModel>
-{
-    public HellRepository(string connectionString, string databaseName) : base(connectionString, databaseName)
-    {
-    }
-}
-
 public class HellRepositoryWithProfiling : HellRepository
-{
-    public HellRepositoryWithProfiling(string connectionString, string databaseName) : base(connectionString, databaseName)
-    {
-        
-    }
-
-    public override Task AddOrUpdateItemAsync(HellModel item, string collectionName)
-    {
-        using var profiler = Profiler.GetProfiler(nameof(HellRepository.AddOrUpdateItemAsync));
-        return base.AddOrUpdateItemAsync(item, collectionName);
-    }
-
-    public override Task<HellModel> GetItemAsync(string id, string collectionName)
-    {
-        using var profiler = Profiler.GetProfiler(nameof(HellRepository.GetItemAsync));
-        return base.GetItemAsync(id, collectionName);
-    }
-
-    public override Task DeleteItemAsync(string id, string collectionName)
-    {
-        using var profiler = Profiler.GetProfiler(nameof(HellRepository.DeleteItemAsync));
-        return base.DeleteItemAsync(id, collectionName);
-    }
-}
 ```
 
-- Проливаем данные из PG. Показать результаты профилирования в консоль.
-- Показываем что схемы не было и автоматически создались база и коллекции. 
-Можно повторить N раз меняя имя базы и коллекции.
-показываем что для ПГ надо было постоянно контролировать схему и миграции.
+- показываем импортер и foreachAsync. Проливаем данные в несколько потоков. 
+- Перфоманс из коробки. Показать результаты профилирования в консоль. 0.3-0.5 мс на операцию.
+- Показываем что схемы не было и автоматически создались база и коллекции чяерез монго компасс. 
+- Можно повторить N раз меняя имя базы и коллекции. Поясняем что для ПГ надо было постоянно контролировать схему и миграции.
 
-Рассказать про правила именования Id и про ObjectId.
+Показываем даныне в компасе, обращаем внимание на _id и про ObjectId.
 
 ObjectIds are small, likely unique, fast to generate, and ordered. ObjectId values are 12 bytes in length, consisting of:
 - a 4-byte timestamp value, representing the ObjectId’s creation, measured in seconds since the Unix epoch
 - a 5-byte random value
 - a 3-byte incrementing counter, initialized to a random value
-    
-- Перфоманс из коробки - показываем график из данных профилирования (все быстро и хорошо).
-
-
 ## 4 круг - Жадность.
 
 *Дима:*

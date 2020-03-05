@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ImportApp.Extensions
+namespace Core.Extensions
 {
 	public static class EnumerableExtensions
 	{
@@ -27,7 +27,8 @@ namespace ImportApp.Extensions
 					{
 						while (partition.MoveNext())
 						{
-							await function(partition.Current).ConfigureAwait(false);
+							var sourceItem = partition.Current;
+							await function(sourceItem).ConfigureAwait(false);
 						}
 					}
 				}));
