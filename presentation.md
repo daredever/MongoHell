@@ -239,6 +239,23 @@ The mongo shell prompt has a limit of 4095 codepoints for each line. If you ente
 - Рассказать про nuget MongoDB.Driver, Core, Bson.
 - Выделение отдельной сущности для singleton MongoClient - управление пулом коннектов и dispose автоматические.
 
+```c#
+internal sealed class ConnectionManager : IConnectionManager
+{    
+    public IMongoDatabase Db { get; private set; }
+
+    public void Initialize(string connectionString, string dbName)
+    {
+        var url = new MongoUrl(connectionString);
+        var mongoClientSettings = MongoClientSettings.FromUrl(url);     
+        _client = new MongoClient(mongoClientSettings);
+        Db = _client.GetDatabase(dbName);
+    }
+
+    private MongoClient _client;
+}
+```
+
 (тут примеры кода)
 
 - Непривычная фильтрация - вкусовщина, кому-то нравится, кому-то нет. Проблемы с лямбдами - найти issue.
