@@ -11,8 +11,6 @@ namespace ImportApp.Services
 	internal class MongoHellImporter
 	{
 		private const int Partitions = 20;
-		private const string CollectionName = "HellCollection";
-
 		private readonly IBaseRepository _mongoRepo;
 
 		public MongoHellImporter(IBaseRepository mongoRepo) => _mongoRepo = mongoRepo;
