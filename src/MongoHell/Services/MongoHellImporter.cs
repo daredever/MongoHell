@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Extensions;
 using Core.Models;
+using Core.Services;
 using Core.Repositories;
 using MongoHell.Models;
 
-namespace ImportApp.Services
+namespace MongoHell.Services
 {
-	internal class MongoHellImporter
+	public class MongoHellImporter : IMongoHellImporter
 	{
 		private const int Partitions = 20;
 		private readonly IBaseRepository _mongoRepo;
