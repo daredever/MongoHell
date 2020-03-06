@@ -313,6 +313,8 @@ if (result.Succeeded) await session.CommitTransactionAsync();
 надо найти текст ошибок в монге и монго драйвере (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/).
 акцент именно на некорректной ошибке и о том что документацию надо читать не только нам.
 
+https://github.com/mongodb/mongo-csharp-driver/pull/389
+
 *Рома:*
 
 Проблемы выявленные при тестировании:
@@ -333,6 +335,14 @@ BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
 - https://stackoverflow.com/questions/16765543/properly-using-handling-datetimeoffset-in-mongodb
 - https://stackoverflow.com/questions/10480127/mongodb-and-datetimeoffset-type
 - https://blog.krusen.dk/c-mongodb-serialization-of-datetimeoffset/
+
+- Проблемы сериализации int32.
+
+https://docs.mongodb.com/manual/core/shell-types
+
+https://jira.mongodb.org/browse/CSHARP-2602
+
+сделать PR на github
 
 ## Дорога к раю.
 
