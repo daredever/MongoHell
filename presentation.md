@@ -109,7 +109,7 @@ MongoDB изначально выходил под лицензией GNU Affero
 
 Показываем mongoCompass и пустую монгу и режим Standalone.
 
-- Простота использования (Пример репозитория CRUD). 
+- Простота использования (Пример репозитория CRUD) - глянуть nuget MongoRepository. 
 Показываем nuget пакет MongoDB.Driver
 Показываем generic repository.
 
@@ -329,7 +329,43 @@ https://studio3t.com/knowledge-base/articles/mongodb-best-practices-uuid-data/#m
 BsonDefaults.GuidRepresentation = GuidRepresentation.Standard;
 ```
 
-- Проблема версий пакета Mongo.Bson (DateTimeOffset) и необходимость интеграционных тестов на сериализацию/десериализацию.
+```c#
+public enum GuidRepresentation
+{
+    /// <summary>
+    /// The representation for Guids is unspecified, so conversion between Guids and Bson binary data is not possible.
+    /// </summary>
+    Unspecified = 0,
+    /// <summary>
+    /// Use the new standard representation for Guids (binary subtype 4 with bytes in network byte order).
+    /// </summary>
+    Standard,
+    /// <summary>
+    /// Use the representation used by older versions of the C# driver (including most community provided C# drivers).
+    /// </summary>
+    CSharpLegacy,
+    /// <summary>
+    /// Use the representation used by older versions of the Java driver.
+    /// </summary>
+    JavaLegacy,
+    /// <summary>
+    /// Use the representation used by older versions of the Python driver.
+    /// </summary>
+    PythonLegacy
+}
+
+... test ->
+switch (BsonDefaults.GuidRepresentation)
+{
+    case GuidRepresentation.CSharpLegacy: expectedGuidJson = "CSUUID(\"00112233-4455-6677-8899-aabbccddeeff\")"; break;
+    case GuidRepresentation.JavaLegacy: expectedGuidJson = "JUUID(\"00112233-4455-6677-8899-aabbccddeeff\")"; break;
+    case GuidRepresentation.PythonLegacy: expectedGuidJson = "PYUUID(\"00112233-4455-6677-8899-aabbccddeeff\")"; break;
+    case GuidRepresentation.Standard: expectedGuidJson = "UUID(\"00112233-4455-6677-8899-aabbccddeeff\")"; break;
+    default: throw new Exception("Invalid GuidRepresentation.");
+}
+```
+
+- Проблема версий пакета Mongo.Bson (DateTimeOffset) и необходимость интеграционных тестов на сериализацию/десериализацию. (mongo2go nuget для тестов)
 (надо воспроизвести, указать версии пакетов, сравнить код сериализатора):
 - https://jira.mongodb.org/browse/CSHARP-1483
 - https://stackoverflow.com/questions/16765543/properly-using-handling-datetimeoffset-in-mongodb
