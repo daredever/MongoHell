@@ -54,6 +54,7 @@ BSON (англ. Binary JavaScript Object Notation) — формат электр
 я решил обратиться к ресёрчу который проводился к 51 встрече, и на примере документов с ссылкой
 и документа в документе показал, что по производительности mongoDB выигрывает у пг. -- слайд из предыдущего доклада
 
+Jabson test for acid.
 Бенчмарки производительности для любого руководства  всегда выглядят весомо.
  
 Простота репликации и шардирования, не требующая глубокого понимания принципов работы БД. -- слайд со схемой шардирования
@@ -181,7 +182,7 @@ ObjectIds are small, likely unique, fast to generate, and ordered. ObjectId valu
 
   => replica set => sharded cluster (yaml config) - почему 15 шт?
 - mongod + mongos.
-- Проверка отказоусточивости + split brain
+- Проверка отказоусточивости. priority. write concern. split brain
 
 ## 6 круг - Для еретиков и лжеучителей.
 
@@ -272,13 +273,14 @@ internal sealed class ConnectionManager : IConnectionManager
 (тут примеры кода)
 
 - Транзакции - основы работы.
-В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID:
-- In version 4.0, MongoDB supports multi-document transactions on replica sets.
-- In version 4.2, MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
 
 https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability
 
 https://docs.mongodb.com/manual/core/transactions/
+
+В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID:
+- In version 4.0, MongoDB supports multi-document transactions on replica sets.
+- In version 4.2 (август 2019), MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
 
 ```c#
 var sessionOptions = new ClientSessionOptions
@@ -304,7 +306,9 @@ if (result.Succeeded) await session.CommitTransactionAsync();
 Неудобный MongoDB Compass. Есть DataGrip, Robo 3T.
 Рассказать про средства мониторинга запросов, explain, план запроса.
 
-- Проблема с транзакциями (работают только в режиме кластера). надо найти текст ошибок в монге и монго драйвере (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/)
+- Проблема с транзакциями (работают только в режиме кластера, но админы решили сэкономить на тестовых стендах). 
+надо найти текст ошибок в монге и монго драйвере (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/).
+акцент именно на некорректной ошибке и о том что документацию надо читать не только нам.
 
 *Рома:*
 
