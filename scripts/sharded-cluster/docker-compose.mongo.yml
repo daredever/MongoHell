@@ -1,0 +1,49 @@
+version: '3.1'
+services: 
+
+
+## Router
+  router:
+    image: mongo:4.2.3
+    restart: always
+    container_name: router
+    command: mongos --port 27117 --configdb rs-config-server/${SERVER1}:27118,${SERVER2}:27118,${SERVER3}:27118 --bind_ip_all
+    network_mode: "host"
+   
+
+
+## Config Servers
+  configsvr01:
+    image: mongo:4.2.3
+    restart: always
+    container_name: mongo-config
+    command: mongod --port 27118 --configsvr --replSet rs-config-server
+    network_mode: "host"    
+
+
+
+## Shards
+   
+  shard01:
+    image: mongo:4.2.3
+    restart: always
+    container_name: shard-01-node
+    command: mongod --port 27119 --shardsvr --replSet rs-shard-01
+    network_mode: "host"
+    
+
+  shard02:
+    image: mongo:4.2.3
+    restart: always
+    container_name: shard-02-node
+    command: mongod --port 27120 --shardsvr --replSet rs-shard-02
+    network_mode: "host"
+    
+
+  shard03:
+    image: mongo:4.2.3
+    restart: always
+    container_name: shard-03-node
+    command: mongod --port 27121 --shardsvr --replSet rs-shard-03
+    network_mode: "host"
+    
