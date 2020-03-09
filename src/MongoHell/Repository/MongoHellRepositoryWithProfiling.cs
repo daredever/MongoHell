@@ -12,19 +12,22 @@ namespace MongoHell.Repository
 
 		public override Task AddOrUpdateItemAsync<T>(T item, string collectionName)
 		{
-			using var profiler = Profiler.GetProfiler(nameof(base.AddOrUpdateItemAsync));
+			var stage = $"{nameof(AddOrUpdateItemAsync)}({typeof(T).Name}, \"{collectionName}\")";
+			using var profiler = Profiler.GetProfiler(stage);
 			return base.AddOrUpdateItemAsync(item, collectionName);
 		}
 
 		public override Task<T> GetItemAsync<T>(string id, string collectionName)
 		{
-			using var profiler = Profiler.GetProfiler(nameof(base.GetItemAsync));
+			var stage = $"{nameof(GetItemAsync)}(\"{id}\", \"{collectionName})\"";
+			using var profiler = Profiler.GetProfiler(stage);
 			return base.GetItemAsync<T>(id, collectionName);
 		}
 
 		public override Task DeleteItemAsync<T>(string id, string collectionName)
 		{
-			using var profiler = Profiler.GetProfiler(nameof(base.DeleteItemAsync));
+			var stage = $"{nameof(DeleteItemAsync)}(\"{id}\", \"{collectionName})\"";
+			using var profiler = Profiler.GetProfiler(stage);
 			return base.DeleteItemAsync<T>(id, collectionName);
 		}
 	}
