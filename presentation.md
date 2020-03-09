@@ -398,24 +398,75 @@ public sealed class ConnectionManager : IConnectionManager
 ```
 
 #### слайд --> (filter)
-- Непривычная фильтрация - вкусовщина, кому-то нравится, кому-то нет. 
+- Непривычный DSL - вкусовщина, кому-то нравится, кому-то нет.
+
+Фильтрация: 
     1. Условные операторы
     1. Логические операторы
     1. Поиск по массивам
 
-(тут примеры кода)
+```c#
+FilterDefinition<BsonDocument> filter = "{ x: 1 }";
+FilterDefinition<BsonDocument> filter = new BsonDocument("x", 1);
 
-Попадались issue с лямбдами , но на практике не сталкивалсяю
+var filter = Builders<BsonDocument>.Filter.Eq("i", 71);
+var filter = Builders<BsonDocument>.Filter.Gt("i", 50);
+
+var filterBuilder = Builders<BsonDocument>.Filter;
+var filter = filterBuilder.Gt("i", 50) & filterBuilder.Lte("i", 100);
+```
+
+Поддерживаются лямбды. Попадались issue с лямбдами, но на практике не сталкивался.
+
+Также есть билдеры для обновления:
+
+```c#
+var filter = Builders<BsonDocument>.Filter.Eq("i", 10);
+var update = Builders<BsonDocument>.Update.Set("i", 110);
+await collection.UpdateOneAsync(filter, update);
+```
+
+Также есть экстеншены для сортировки:
+```c#
+var filter = Builders<BsonDocument>.Filter.Exists("i");
+var sort = Builders<BsonDocument>.Sort.Descending("i");
+var document = await collection.Find(filter).Sort(sort).FirstAsync();
+
+var builder = Builders<BsonDocument>.Sort;
+var sort = builder.Ascending("x").Descending("y");
+```
+
+Projecting Fields:
+```c#
+var projection = Builders<BsonDocument>.Projection.Exclude("_id");
+var document = await collection.Find(new BsonDocument()).Project(projection).FirstAsync();
+
+var projection = Builders<BsonDocument>.Projection.Include("x").Include("y").Exclude("_id");
+```
 
 #### слайд --> (BSON)
 - Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. 
 
-#### слайд --> (attributes)
+ToBsonDocument, ToJson. 
+
+Можно писать и регестрировать свои сериализаторы.
+
+https://mongodb.github.io/mongo-csharp-driver/2.7/reference/bson/mapping/
 BsonIgnore и другие атрибуты, показать пример в коде. 
 Нет атрибутов для индексов, кроме BsonId. 
 
 #### слайд --> (конвенции)
 Конвенции - https://github.com/mongodb/mongo-csharp-driver/tree/master/src/MongoDB.Bson/Serialization/Conventions.
+
+When automapping a class, there are a lot of decisions that need to be made. For example:
+
+Which members of the class should be serialized
+Which member of the class is the “Id”
+What element name should be used in the BSON document
+If the class is being used polymorphically, what discriminator values are used
+What should happen if a BSON document has elements we don’t recognize
+Does the member have a default value
+Should the default value be serialized or ignored
 
 #### слайд --> (транзакции)
 
@@ -429,6 +480,8 @@ https://docs.mongodb.com/manual/core/transactions/
 - In version 4.0, MongoDB supports multi-document transactions on replica sets.
 - In version 4.2 (август 2019), MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
 
+Call AbortTransaction or AbortTransactionAsync to abort a transaction. Since any transaction in progress is automatically aborted when a session is ended, you can also implicitly abort an uncommitted transaction by simply ending the session.
+
 #### слайд --> (транзакции код)
 
 ```c#
@@ -440,8 +493,25 @@ var sessionOptions = new ClientSessionOptions
 };
 using var session = await _mongoConnectionManager.StartSession(sessionOptions);
 session.StartTransaction(transactionOptions);
-// var result = do some work with mongo db; 
+// var result = do some work with mongo db using the session; 
 if (result.Succeeded) await session.CommitTransactionAsync();
+```
+
+или полностью асинхронно
+```c#
+using (var session = await client.StartSessionAsync())
+{
+    try
+    {
+        // execute async operations using the session
+    }
+    catch
+    {
+        await session.AbortTransactionAsync(); // now Dispose on the session has nothing to do and won't block
+        throw;
+    }
+    await session.CommitTransactionAsync();
+}
 ```
 
 #### слайд --> (9. Для отступников и предателей всех сортов)
