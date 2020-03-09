@@ -11,13 +11,6 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{5A9B2A3B-6FE2-44C1-99E4-DCA4BE98BBA0}"
-ProjectSection(SolutionItems) = preProject
-	scripts\cluster.js = scripts\cluster.js
-	scripts\docker-compose-standalone.yml = scripts\docker-compose-standalone.yml
-	scripts\Readme.md = scripts\Readme.md
-EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{771069D0-F4AC-404A-A5B4-9D72970C0453}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportApp", "src\ImportApp\ImportApp.csproj", "{24C0A204-87F7-4D8C-809C-FF3204C0432C}"
