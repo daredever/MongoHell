@@ -4,13 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoHell", "src\MongoHell\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D8DEF650-597E-41F7-84AA-523314E15A78}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{77A14D47-67D0-402A-A0C8-D8B1ACE85B60}"
-ProjectSection(SolutionItems) = preProject
-	LICENSE = LICENSE
-	presentation.md = presentation.md
-	README.md = README.md
-EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{771069D0-F4AC-404A-A5B4-9D72970C0453}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportApp", "src\ImportApp\ImportApp.csproj", "{24C0A204-87F7-4D8C-809C-FF3204C0432C}"
