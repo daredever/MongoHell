@@ -2,7 +2,7 @@
 
 Instructions for using docker-compose.yml
  
-# Start standalone mongodb container
+# Standalone MongoDB
 Commands:
 1. switch folder: cd standalone
 1. create container: docker-compose up -d
