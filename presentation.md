@@ -160,6 +160,8 @@ public class MongoDBBaseRepository<T> : IBaseRepository<T> where T : IBaseModel
 как, например, в случае с подключениями к другим базам данных, 
 так как MongoDB сама выполнит всю работу (найти инфу в документации).
 
+Without any arguments, constructing a MongoClient instance will connect to “localhost” port 27017.
+
 Добавили профилирование в код, чтобы понимать где конкретно происходят тормоза.
 
 ```c#
@@ -283,31 +285,44 @@ _Рома:_
 Я сам .net разработчик с бэкграундом MS SQL SERVER и что я не понимал.
 
 #### слайд --> (сollection != table)
-- collection != table. Хранение произвольных объектов в одной коллекции - добавить примеры 
+- collection != table. В статьях часто пишут что коллекцию можно представлять как некую таблицу. 
+Я считаю что тут как раз и кроется самое главное упущение. 
+МонгоДБ позволяет хранить разные документы в одной коллекции.
+Давайте представим у нас есть клиенты (физлица и юрлица), у каждого есть номер телефона. Нам надо разослать им смски.
 
 #### слайд --> (реляционный пример)
-реляционный пример: таблица клиенты, таблица юрлица, таблица физлица, таблица телефоны 
+реляционная модель: таблица клиенты, таблица юрлица, таблица физлица
 
 #### слайд --> (реляционные запросы)
-два запроса для получения телефонов с джоинами
+делаем запрос с union: 
+```sql
+select phone from clients inner join (ur union fiz) where clients.id = 1;
+```
 
 #### слайд --> (nosql пример)
-nosql: коллекция клиенты 
+nosql: коллекция клиенты и два типа документов
 
 #### слайд --> (nosql запрос)
 один запрос (забегая немного вперед)
+```js
+db.clients.find({_id: 1});
+```
 
 #### слайд --> (data-modeling-embedding)
-data model
-(тут картинка - несколько таблиц превращаются в одну коллекцию)
+
+вообще в документации есть примеры как можно проектировать структуры для хранения. например как показано выше - embedding.
+
+когда документ сложный и все хранится в нем.
 
 https://docs.mongodb.com/manual/core/data-model-design/#data-modeling-embedding
 
-Сложный документ - значит транзакции частно не нужны - можно хранить все в одном документе.
+Сложный документ - значит обновление можно выполнять за одну операцию, что удобно.
 
 #### слайд --> (data-modeling-referencing)
+или другой вариант со ссылками - referencing, по сути так же как и в реляционных базах.
 https://docs.mongodb.com/manual/core/data-model-design/#data-modeling-referencing
 
+на практике чаще получается использовать комбинацию этих приемов.
 
 #### слайд --> (7. Для насильников и убийц всех мастей)
 
@@ -334,30 +349,43 @@ _Рома:_
 Особенности при переходе на MongoDB.
 
 #### слайд --> (MongoShell)
-- MongoShell - добавить определение(https://docs.mongodb.com/manual/mongo/). 
+Начать изучение монги лучше отсюда.
 
-DSL - добавить определение. Начать изучение монги лучше отсюда. (https://docs.mongodb.com/manual/crud/)
+MongoShell (https://docs.mongodb.com/manual/mongo/). 
 
-Рассказать про генераторы в js. 
+Монгошелл - это интерфейс командной строки на javascript для работы с mongodb. Можно использовать как для запросов и обновления данных так и для администрирования.
+Монгошелл включен в поставку сервера монгодб, но можно установить отдельно как самостоятельный пакет.
+
+Как уже было видно ранее у монгодб свой DSL. 
+
+#### слайд --> (MongoShell примеры)
+(тут примеры js кода - картинки с сайта https://docs.mongodb.com/manual/crud/ )
+
+Можно писать свои генераторы в js. 
 
 Обратить внимание на перенос строк \n и ограниченную длину строки (не все документы помещаются)
 The mongo shell prompt has a limit of 4095 codepoints for each line. If you enter a line with more than 4095 codepoints, the shell will truncate it.
 
-#### слайд --> (MongoShell примеры)
-(тут примеры js кода)
-
 #### слайд --> (спикок nuget)
-- Рассказать про nuget MongoDB.Driver (Core, Bson). Bson - может потребовать отдельно.
+Рассказать про nuget MongoDB.Driver (Core, Bson). Bson - может потребоваться отдельно для моделек и генераторов.
 
 #### слайд --> (mongo client)
-- Выделение отдельной сущности для singleton MongoClient - управление пулом коннектов и dispose автоматические.
+Выделение отдельной сущности для singleton MongoClient - управление пулом коннектов и dispose автоматические.
 
+A MongoClient object will be the root object. It is thread-safe and is all that is needed to handle connecting to servers, monitoring servers, and performing operations against those servers.
+It is recommended to store a MongoClient instance in a global place, either as a static variable or in an IoC container with a singleton lifetime.
+
+The implementation of IMongoDatabase provided by a MongoClient is thread-safe and is safe to be stored globally or in an IoC container.
+
+The implementation of IMongoCollection<TDocument> ultimately provided by a MongoClient is thread-safe and is safe to be stored globally or in an IoC container. 
+
+Подправить код:
 ```c#
-internal sealed class ConnectionManager : IConnectionManager
+public sealed class ConnectionManager : IConnectionManager
 {    
     public IMongoDatabase Db { get; private set; }
 
-    public void Initialize(string connectionString, string dbName)
+    public void ConnectionManager(string connectionString, string dbName)
     {
         var url = new MongoUrl(connectionString);
         var mongoClientSettings = MongoClientSettings.FromUrl(url);     
@@ -377,7 +405,7 @@ internal sealed class ConnectionManager : IConnectionManager
 
 (тут примеры кода)
 
-Проблемы с лямбдами - найти issue.
+Попадались issue с лямбдами , но на практике не сталкивалсяю
 
 #### слайд --> (BSON)
 - Сериализация. BSON документ (произвольные иерархические структуры данных) и простота сериализации. 
