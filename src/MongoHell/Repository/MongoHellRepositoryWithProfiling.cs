@@ -12,7 +12,7 @@ namespace MongoHell.Repository
 
 		public override Task AddOrUpdateItemAsync<T>(T item, string collectionName)
 		{
-			var stage = $"{nameof(AddOrUpdateItemAsync)}({typeof(T).Name}, \"{collectionName})\"";
+			var stage = $"{nameof(AddOrUpdateItemAsync)}({typeof(T).Name}, \"{collectionName}\")";
 			using var profiler = Profiler.GetProfiler(stage);
 			return base.AddOrUpdateItemAsync(item, collectionName);
 		}
