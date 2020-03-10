@@ -469,99 +469,6 @@ What should happen if a BSON document has elements we don’t recognize
 Does the member have a default value
 Should the default value be serialized or ignored
 
-#### слайд --> (транзакции)
-
-- Транзакции - основы работы.
-
-https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability
-
-https://docs.mongodb.com/manual/core/transactions/
-
-В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID:
-- In version 4.0, MongoDB supports multi-document transactions on replica sets.
-- In version 4.2 (август 2019), MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
-
-Call AbortTransaction or AbortTransactionAsync to abort a transaction. Since any transaction in progress is automatically aborted when a session is ended, you can also implicitly abort an uncommitted transaction by simply ending the session.
-
-#### слайд --> (транзакции код)
-
-```c#
-var sessionOptions = new ClientSessionOptions
-{
-    DefaultTransactionOptions = new TransactionOptions(
-        readConcern: new Optional<ReadConcern>(ReadConcern.Local),
-        writeConcern: new Optional<WriteConcern>(WriteConcern.WMajority))
-};
-using var session = await _mongoConnectionManager.StartSession(sessionOptions);
-session.StartTransaction(transactionOptions);
-// var result = do some work with mongo db using the session; 
-if (result.Succeeded) await session.CommitTransactionAsync();
-```
-
-или полностью асинхронно
-```c#
-using (var session = await client.StartSessionAsync())
-{
-    try
-    {
-        // execute async operations using the session
-    }
-    catch
-    {
-        await session.AbortTransactionAsync(); // now Dispose on the session has nothing to do and won't block
-        throw;
-    }
-    await session.CommitTransactionAsync();
-}
-```
-
-#### слайд --> (9. Для отступников и предателей всех сортов)
-
-## 9 круг - Для отступников и предателей всех сортов.
-
-_Дима:_
-
-здесь мы расскажем о проблемах с которыми мы столкнулись при тестировании и внедрении.
-
-#### слайд --> (список UI)
-
-- Проблемы с поиском по датам (фильтры, непонимание DSL) и Проблемы с UI для администрирования данных.
-
-Неудобный MongoDB Compass. Есть DataGrip, Robo 3T.
-
-#### слайд --> (compass start)
-компас вход
-
-#### слайд --> (compass doc)
-компас документ
-
-#### слайд --> (compass query)
-компас explain query
-
-- Анализ индексов на бою под нагрузкой. Особенности использования индексов при построении запросов - один индекс на запрос (поискать hint в монго-клиенте).
-Performance:
-- Because the index contains all fields required by the query, MongoDB can both match the query conditions and return the results using only the index.
-- Querying only the index can be much faster than querying documents outside of the index. Index keys are typically smaller than the documents they catalog, and indexes are typically available in RAM or located sequentially on disk.
-- In most cases the query optimizer selects the optimal index for a specific operation; however, you can force MongoDB to use a specific index using the hint() method. Use hint() to support performance testing, or on some queries where you must select a field or field included in several indexes.
-
-план запросов - https://docs.mongodb.com/manual/reference/explain-results/
-
-#### слайд --> (compass stat)
-компас performance. компас это инструмент для админов и dba.
-
-#### слайд --> (robo3t doc)
-robo3t json
-
-#### слайд --> (data grip start)
-data grip вход
-
-#### слайд --> (проблема с транзациями)
-- Проблема с транзакциями (работают только в режиме кластера, но админы решили сэкономить на тестовых стендах). 
- 
-разные ошибки в монге и в монго клиенте (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/).
-акцент именно на некорректной ошибке и о том что документацию надо читать не только нам.
-https://github.com/mongodb/mongo-csharp-driver/pull/389
-
 #### слайд --> (проблема GUID)
 _Рома:_
 
@@ -619,6 +526,99 @@ https://docs.mongodb.com/manual/core/shell-types
 https://jira.mongodb.org/browse/CSHARP-2602
 
 сделать PR на github
+
+#### слайд --> (транзакции)
+
+- Транзакции - основы работы.
+
+https://www.mongodb.com/blog/post/mongodb-multi-document-acid-transactions-general-availability
+
+https://docs.mongodb.com/manual/core/transactions/
+
+В июне 2018 года (в версии 4.0) добавлена поддержка транзакций, удовлетворяющих требованиям ACID:
+- In version 4.0, MongoDB supports multi-document transactions on replica sets.
+- In version 4.2 (август 2019), MongoDB introduces distributed transactions, which adds support for multi-document transactions on sharded clusters and incorporates the existing support for multi-document transactions on replica sets.
+
+Call AbortTransaction or AbortTransactionAsync to abort a transaction. Since any transaction in progress is automatically aborted when a session is ended, you can also implicitly abort an uncommitted transaction by simply ending the session.
+
+#### слайд --> (транзакции код)
+
+```c#
+var sessionOptions = new ClientSessionOptions
+{
+    DefaultTransactionOptions = new TransactionOptions(
+        readConcern: new Optional<ReadConcern>(ReadConcern.Local),
+        writeConcern: new Optional<WriteConcern>(WriteConcern.WMajority))
+};
+using var session = await _mongoConnectionManager.StartSession(sessionOptions);
+session.StartTransaction(transactionOptions);
+// var result = do some work with mongo db using the session; 
+if (result.Succeeded) await session.CommitTransactionAsync();
+```
+
+или полностью асинхронно
+```c#
+using (var session = await client.StartSessionAsync())
+{
+    try
+    {
+        // execute async operations using the session
+    }
+    catch
+    {
+        await session.AbortTransactionAsync(); // now Dispose on the session has nothing to do and won't block
+        throw;
+    }
+    await session.CommitTransactionAsync();
+}
+```
+
+#### слайд --> (проблема с транзациями)
+- Проблема с транзакциями (работают только в режиме кластера, но админы решили сэкономить на тестовых стендах). 
+ 
+разные ошибки в монге и в монго клиенте (retry writes=true - https://docs.mongodb.com/manual/core/retryable-writes/).
+акцент именно на некорректной ошибке и о том что документацию надо читать не только нам.
+https://github.com/mongodb/mongo-csharp-driver/pull/389
+
+#### слайд --> (9. Для отступников и предателей всех сортов)
+
+## 9 круг - Для отступников и предателей всех сортов.
+
+_Дима:_
+
+здесь мы расскажем о проблемах с которыми мы столкнулись при тестировании и внедрении.
+
+#### слайд --> (список UI)
+
+- Проблемы с поиском по датам (фильтры, непонимание DSL) и Проблемы с UI для администрирования данных.
+
+Неудобный MongoDB Compass. Есть DataGrip, Robo 3T.
+
+#### слайд --> (compass start)
+компас вход
+
+#### слайд --> (compass doc)
+компас документ
+
+#### слайд --> (compass query)
+компас explain query
+
+- Анализ индексов на бою под нагрузкой. Особенности использования индексов при построении запросов - один индекс на запрос (поискать hint в монго-клиенте).
+Performance:
+- Because the index contains all fields required by the query, MongoDB can both match the query conditions and return the results using only the index.
+- Querying only the index can be much faster than querying documents outside of the index. Index keys are typically smaller than the documents they catalog, and indexes are typically available in RAM or located sequentially on disk.
+- In most cases the query optimizer selects the optimal index for a specific operation; however, you can force MongoDB to use a specific index using the hint() method. Use hint() to support performance testing, or on some queries where you must select a field or field included in several indexes.
+
+план запросов - https://docs.mongodb.com/manual/reference/explain-results/
+
+#### слайд --> (compass stat)
+компас performance. компас это инструмент для админов и dba.
+
+#### слайд --> (robo3t doc)
+robo3t json
+
+#### слайд --> (data grip start)
+data grip вход
 
 #### слайд --> (Дорога к раю)
 
