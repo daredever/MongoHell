@@ -380,21 +380,27 @@ The implementation of IMongoDatabase provided by a MongoClient is thread-safe an
 
 The implementation of IMongoCollection<TDocument> ultimately provided by a MongoClient is thread-safe and is safe to be stored globally or in an IoC container. 
 
-Подправить код:
 ```c#
 public sealed class ConnectionManager : IConnectionManager
-{    
-    public IMongoDatabase Db { get; private set; }
-
-    public void ConnectionManager(string connectionString, string dbName)
+{   
+    public Dictionary<string, IMongoDatabase> Databases = new Dictionary<string, IMongoDatabase>();
+    private readonly IMongoClient _client;
+    
+    public ConnectionManager(string connectionString)
     {
-        var url = new MongoUrl(connectionString);
-        var mongoClientSettings = MongoClientSettings.FromUrl(url);     
+        var mongoClientSettings = MongoClientSettings.FromUrl(new MongoUrl(connectionString));
         _client = new MongoClient(mongoClientSettings);
-        Db = _client.GetDatabase(dbName);
     }
 
-    private MongoClient _client;
+    public IMongoDatabase GetDatabase(string dbName)
+    {
+        if (Databases.TryGetValue(dbName, out var db)) return db;
+        
+        db = _client.GetDatabase(dbName);
+        Databases.Add(dbName, db);
+        
+        return db;
+    }
 }
 ```
 
