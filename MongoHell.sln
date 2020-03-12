@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoHell", "src\MongoHell\MongoHell.csproj", "{4E405D05-157A-480E-9DC6-70DBE2E5080D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{D8DEF650-597E-41F7-84AA-523314E15A78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "src\Core\Core.csproj", "{771069D0-F4AC-404A-A5B4-9D72970C0453}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportApp", "src\ImportApp\ImportApp.csproj", "{24C0A204-87F7-4D8C-809C-FF3204C0432C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{771069D0-F4AC-404A-A5B4-9D72970C0453}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{771069D0-F4AC-404A-A5B4-9D72970C0453}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{771069D0-F4AC-404A-A5B4-9D72970C0453}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{771069D0-F4AC-404A-A5B4-9D72970C0453}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C0A204-87F7-4D8C-809C-FF3204C0432C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C0A204-87F7-4D8C-809C-FF3204C0432C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C0A204-87F7-4D8C-809C-FF3204C0432C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C0A204-87F7-4D8C-809C-FF3204C0432C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E405D05-157A-480E-9DC6-70DBE2E5080D} = {D8DEF650-597E-41F7-84AA-523314E15A78}
+		{771069D0-F4AC-404A-A5B4-9D72970C0453} = {D8DEF650-597E-41F7-84AA-523314E15A78}
+		{24C0A204-87F7-4D8C-809C-FF3204C0432C} = {D8DEF650-597E-41F7-84AA-523314E15A78}
+	EndGlobalSection
+EndGlobal

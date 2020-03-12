@@ -1,0 +1,9 @@
+version: "3"
+services:
+  mongo1:
+    hostname: mongo-standalone
+    container_name: mongo-standalone
+    image: mongo:4.2.3
+    ports:
+      - 27017:27017
+    restart: always  
