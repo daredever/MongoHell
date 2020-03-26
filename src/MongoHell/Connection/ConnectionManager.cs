@@ -5,7 +5,7 @@ using MongoDB.Driver.Core.Clusters;
 
 namespace MongoHell.Connection
 {
-	internal sealed class ConnectionManager : IConnectionManager
+	public sealed class ConnectionManager : IConnectionManager
 	{
 		bool IConnectionManager.TransactionsAvailable => _transactionsAvailable;
 

@@ -1,13 +1,12 @@
-﻿﻿using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
- namespace MongoHell.Connection
+namespace MongoHell.Connection
 {
 	/// <summary>
 	/// Connection manager for MongoDB.
 	/// </summary>
 	public interface IConnectionManager
 	{
-		
 		/// <summary>
 		/// Returns true if transactions are available.  
 		/// </summary>
