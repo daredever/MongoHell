@@ -22,6 +22,16 @@ namespace MongoHell.Connection
 			}
 		}
 
+		public ConnectionManager(MongoClientSettings settings)
+		{
+			_client = new MongoClient(settings);
+
+			using (_client.StartSession())
+			{
+				_transactionsAvailable = _client.Cluster.Description.Type != ClusterType.Standalone;
+			}
+		}
+
 		public IMongoDatabase GetDatabase(string dbName) =>
 			_databases.GetOrAdd(dbName, name => _client.GetDatabase(name));
 
