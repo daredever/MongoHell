@@ -9,7 +9,7 @@ using MongoHell.Models;
 
 namespace MongoHell.Services
 {
-	public class MongoHellImporter : IMongoHellImporter
+	public class MongoHellImporter : IHellImporter
 	{
 		private const int Partitions = 20;
 		private readonly IBaseRepository _mongoRepo;
