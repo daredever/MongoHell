@@ -23,22 +23,22 @@ namespace MongoHell.Repository
 
 		public virtual Task AddOrUpdateItemAsync<T>(T item, string collectionName) where T : IBaseModel
 		{
-			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
+			var collection = _mongoDatabase.GetCollection<T>(collectionName);
 			var options = new ReplaceOptions {IsUpsert = true};
-			return keyCollection.ReplaceOneAsync(x => x.ExternalId == item.ExternalId, item, options);
+			return collection.ReplaceOneAsync(x => x.ExternalId == item.ExternalId, item, options);
 		}
 
 		public virtual async Task<T> GetItemAsync<T>(string id, string collectionName) where T : IBaseModel
 		{
-			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
-			using var cursor = await keyCollection.FindAsync(x => x.ExternalId == id);
+			var collection = _mongoDatabase.GetCollection<T>(collectionName);
+			using var cursor = await collection.FindAsync(x => x.ExternalId == id);
 			return await cursor.SingleOrDefaultAsync();
 		}
 
 		public virtual Task DeleteItemAsync<T>(string id, string collectionName) where T : IBaseModel
 		{
-			var keyCollection = _mongoDatabase.GetCollection<T>(collectionName);
-			return keyCollection.DeleteOneAsync(x => x.ExternalId == id);
+			var collection = _mongoDatabase.GetCollection<T>(collectionName);
+			return collection.DeleteOneAsync(x => x.ExternalId == id);
 		}
 	}
 }
