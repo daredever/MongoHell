@@ -7,7 +7,7 @@ namespace MongoHell.Connection
 {
 	public sealed class ConnectionManager : IConnectionManager
 	{
-		bool IConnectionManager.TransactionsAvailable => _transactionsAvailable;
+		public bool TransactionsAvailable => _transactionsAvailable;
 
 		public ConnectionManager(string connectionString)
 		{
