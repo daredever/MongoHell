@@ -31,8 +31,7 @@ namespace MongoHell.Repository
 		public virtual async Task<T> GetItemAsync<T>(string id, string collectionName) where T : IBaseModel
 		{
 			var collection = _mongoDatabase.GetCollection<T>(collectionName);
-			using var cursor = await collection.FindAsync(x => x.ExternalId == id);
-			return await cursor.SingleOrDefaultAsync();
+			return await collection.Find(x => x.ExternalId == id).SingleOrDefaultAsync();
 		}
 
 		public virtual Task DeleteItemAsync<T>(string id, string collectionName) where T : IBaseModel
