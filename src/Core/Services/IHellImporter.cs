@@ -2,7 +2,7 @@
 
 namespace Core.Services
 {
-	public interface IMongoHellImporter
+	public interface IHellImporter
 	{
 		Task ImportAsync();
 	}
